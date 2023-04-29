@@ -15,7 +15,7 @@ class DetectEnglishLevel():
     
     def __init__(self):
         self.ENGLISH_LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1']
-        self.oxford_words = load(os.path.abspath(os.getcwd()) + '/oxford_dictionary.joblib')
+        self.oxford_words = load(os.path.dirname(__file__) + '/oxford_dictionary.joblib')
         self.nlp = spacy.load("en_core_web_sm")
     
     def process_srt(self, content):
