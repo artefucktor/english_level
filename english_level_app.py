@@ -12,7 +12,7 @@ from joblib import load
 
 from detect_english_level import DetectEnglishLevel
 
-ENGLISH_LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1']
+ENGLISH_LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2']
 EXAMPLE_SUBS   = 'Fear.2023.720p.WEBRip.x264.AAC-[HQCINEMAS.COM].srt'
 level = 1
 
@@ -48,10 +48,12 @@ with st.spinner('Рассчитываем...'):
         movies = detector.process_data(subs)
         level = model.predict(movies)[0]
 
-current_level = ENGLISH_LEVELS[round(level)-1]
-floor_level   = ENGLISH_LEVELS[int(level)-1]
-up_level      = ENGLISH_LEVELS[int(level)]
-sub_level     = '+' if 0.2 <= level%1 < 0.5 else '+/'+up_level if 0.5 <= level%1 < 0.8 else ''
+current_level = ENGLISH_LEVELS[min(round(level)-1, len(ENGLISH_LEVELS)-1)]
+floor_level   = ENGLISH_LEVELS[min(int(level)-1, len(ENGLISH_LEVELS)-1)]
+up_level      = ENGLISH_LEVELS[min(int(level), len(ENGLISH_LEVELS)-1)]
+sub_level     = '+' if 0.2 <=level%1<0.5 or level>len(ENGLISH_LEVELS)-1 \
+                    else '+/'+up_level if 0.5<=level%1<0.8 \
+                    else ''
 user_level    = floor_level + sub_level
 '---'
 st.subheader('Уровень сложности')
@@ -61,7 +63,7 @@ st.write(f'Для оценки мы используем опыт специал
 st.title(user_level)
 
 level_bar = st.progress(0)
-for i in range(round(1/6 * level * 100)):
+for i in range(min(round(1/6 * level * 100),101)):
     level_bar.progress(i)
     time.sleep(0.001)
 
@@ -74,8 +76,8 @@ st.write('Словарь Oxford соответствует стандартам 
          'система уровней владения иностранным языком, используемая в Европейском Союзе.')
 st.write('Мы рассчитали, слова какого уровня чаще всего встречаются в фильме:')
 
-words_under_level = movies[[l + 'ratio' for l in ENGLISH_LEVELS[:round(level)]]].sum(axis=1)[0]
-words_upper_level = movies[[l + 'ratio' for l in ENGLISH_LEVELS[round(level):]]].sum(axis=1)[0]
+words_under_level = movies[[l + 'ratio' for l in ENGLISH_LEVELS[:min(round(level),5)]]].sum(axis=1)[0]
+words_upper_level = movies[[l + 'ratio' for l in ENGLISH_LEVELS[round(level):5]]].sum(axis=1)[0]
 
 if words_under_level > 0:
     st.progress(words_under_level, text=f"{words_under_level:.0%} слов до {current_level} уровня включительно")
