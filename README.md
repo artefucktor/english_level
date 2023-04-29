@@ -23,7 +23,7 @@ All dependencies can be installed using the `requirements.txt` file provided wit
 
 ## Credits
 
-This application was developed by [Artefucktor]. The NLP libraries used in the application include:
+This application was developed by [@Artefucktor]. The NLP libraries used in the application include:
 
 - [spaCy](https://spacy.io/)
 
