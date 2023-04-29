@@ -123,6 +123,7 @@ class DetectEnglishLevel():
             movies[more_col + 'ratio']  = movies[more_col] / movies.lemmas_count
             movies[less_col + 'ratio']  = movies[less_col] / movies.lemmas_count
 
+        movies = movies.copy()
         movies['target'] = movies.level.replace({'A1':1, 'A2':2, 'B1':3, 'B2':4, 'C1':5, 'C2':6})
         movies = movies.fillna(0)
 
