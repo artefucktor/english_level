@@ -1,0 +1,6 @@
+joblib==1.1.1
+scikit-learn==1.1.3
+streamlit==1.19.0
+spacy==3.5.1
+chardet==4.0.0
+xgboost==1.7.3
