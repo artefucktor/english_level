@@ -49,13 +49,13 @@ with st.spinner('Рассчитываем...'):
         level = model.predict(movies)[0]
 
 current_level = ENGLISH_LEVELS[round(level)-1]
-
+sub_level     = '+' if 0.2 < level%1 < 0.5 else ''
 '---'
 st.subheader('Уровень сложности')
 st.write(f'Для оценки мы используем опыт специалистов и словари Oxford. '
          f'Наши преподаватели рекомендуют фильм для изучения языка на уровне '
-         f'{current_level}.')
-st.title(current_level)
+         f'{current_level + sub_level}.')
+st.title(current_level + sub_level)
 
 level_bar = st.progress(0)
 for i in range(round(1/6 * level * 100)):
