@@ -1,4 +1,5 @@
-# Streamlit Application: Detect Level of English Language in Movie Subtitles
+## Streamlit Application:
+# Detect Level of English Language in Movie Subtitles
 
 This is a Streamlit application that allows users to detect the level of English language in movie subtitles. 
 
