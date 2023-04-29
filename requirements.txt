@@ -4,3 +4,4 @@ streamlit==1.19.0
 spacy==3.5.1
 chardet==4.0.0
 xgboost==1.7.3
+pandas==1.4.4
