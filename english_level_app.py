@@ -27,14 +27,6 @@ level = 1
 model = load(DIRNAME + '/english_level_model.joblib')
 process = ProcessData()
 
-def demo_subs():
-    global filename, content
-    st.write('Демо-файл')
-    filename = EXAMPLE_SUBS
-    fullpath = os.path.join(DIRNAME,filename)
-    encoding = chardet.detect(open(fullpath, "rb").read())['encoding']
-    content = pysrt.open(fullpath, encoding=encoding)
-
 # шапка страницы
 st.set_page_config(page_title='Уровень английского в субтитрах', 
                    page_icon='📺', 
@@ -46,21 +38,20 @@ with st.container():
     st.header('Определим уровень английского')
     st.markdown('*по субтитрам* 📺 *в фильме*')
     
-uploaded_file = st.file_uploader('Загрузите файл с субтитрами в формате .srt', type='.srt')
+uploaded_file = st.file_uploader('Загрузите файл с субтитрами в формате .srt', type='.srt', key=None)
 youtube = st.text_input('или укажите ссылку на YouTube-видео')
 confirm = st.button('Проверить видео по ссылке')
 
-if uploaded_file is not None:
-    # если файл загружен, то определяем кодировку, декодируем и передаем в pysrt
+# по умолчанию показываем демо-файл
+filename = EXAMPLE_SUBS
+fullpath = os.path.join(DIRNAME,filename)
+encoding = chardet.detect(open(fullpath, "rb").read())['encoding']
+content = pysrt.open(fullpath, encoding=encoding)
+
+# запрос на ютуб – выбираем видео id и пытаемся скачать сабы
+if youtube!='' and confirm:
     try:
-        encoding = chardet.detect(uploaded_file.getvalue())['encoding']
-        content = pysrt.from_string(uploaded_file.getvalue().decode(encoding))
-        filename = uploaded_file.name
-    except:
-        st.error(f'К сожалению, не удалось распознать файл')
-        demo_subs()
-elif youtube!='' and confirm:
-    try:
+        uploaded_file = None
         pattern = r'(v=[\w-]+)|(youtu\.be\/[\w-]+)|(embed\/[\w-]+)'
         video_id = re.split(r'[^\w-]',re.search(pattern, youtube).group())[-1]
         transcript = YouTubeTranscriptApi.get_transcript(video_id,languages=['en'])
@@ -71,9 +62,17 @@ elif youtube!='' and confirm:
     except:
         st.error(f'К сожалению, субтитры {youtube} недоступны')
         demo_subs()
-else:
-    # по умолчанию показываем демо-файл
-    demo_subs()
+
+# если файл загружен, то определяем кодировку, декодируем и передаем в pysrt
+if uploaded_file is not None:
+    try:
+        youtube = ''
+        encoding = chardet.detect(uploaded_file.getvalue())['encoding']
+        content = pysrt.from_string(uploaded_file.getvalue().decode(encoding))
+        filename = uploaded_file.name
+    except:
+        st.error(f'К сожалению, не удалось распознать файл')
+        demo_subs()
 
 # обработка файла и предсказание
 st.subheader(filename)
