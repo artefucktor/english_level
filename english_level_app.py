@@ -76,7 +76,6 @@ if uploaded_file is not None:
 
 # обработка файла и предсказание
 st.subheader(filename)
-i = 5 
 with st.spinner('Рассчитываем...'):
     movies = process.process_data(content)
     if len(movies)>0:
@@ -110,8 +109,8 @@ for i in range(min(round(1/6 * level * 100),101)):
 
     
 '---'
-st.subheader(f'Образец: первые {i} титров')
-st.info('\n\n'.join(' '.join([str(s.start), s.text]) for s in content[:i]))
+st.subheader(f'Образец: первые 5 титров')
+st.info('\n\n'.join(' '.join([str(s.start), s.text]) for s in content[:5]))
 
 
 '---'
