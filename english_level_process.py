@@ -40,12 +40,15 @@ class ProcessData():
         charsrate = []
         wordsrate  = []
         for item in content:
-            if item.duration.ordinal>0:
-                line = self.process_line(item.text_without_tags)
-                text.append(line)
-                duration.append(item.duration.to_time())
-                charsrate.append(item.characters_per_second)
-                wordsrate.append(len(line.split())/item.duration.ordinal*1000.0)
+            try:
+                if item.duration.ordinal>0:
+                    line = self.process_line(item.text_without_tags)
+                    text.append(line)
+                    duration.append(item.duration.to_time())
+                    charsrate.append(item.characters_per_second)
+                    wordsrate.append(len(line.split())/item.duration.ordinal*1000.0)
+            except:
+                pass
         return ' '.join(text), duration, charsrate, wordsrate
 
 
