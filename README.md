@@ -18,6 +18,8 @@ The following dependencies are required to run the application:
 - streamlit
 - spacy
 - chardet
+- pysrt
+- youtube-transcript-api
 
 All dependencies can be installed using the `requirements.txt` file provided with the application.
 
@@ -25,7 +27,7 @@ All dependencies can be installed using the `requirements.txt` file provided wit
 
 The NLP libraries used in the application include:
 
-- [spaCy](https://spacy.io/)
+- spaCy
 
 ## License
 
