@@ -77,8 +77,6 @@ if uploaded_file is not None:
 # обработка файла и предсказание
 st.subheader(filename)
 i = 5 
-st.markdown(f'**Образец: первые {i} титров**')
-st.info('\n\n'.join(' '.join([str(s.start), s.text]) for s in content[:i]))
 with st.spinner('Рассчитываем...'):
     movies = process.process_data(content)
     if len(movies)>0:
@@ -109,6 +107,11 @@ level_bar = st.progress(0)
 for i in range(min(round(1/6 * level * 100),101)):
     level_bar.progress(i)
     time.sleep(0.001)
+
+    
+'---'
+st.subheader(f'Образец: первые {i} титров')
+st.info('\n\n'.join(' '.join([str(s.start), s.text]) for s in content[:i]))
 
 
 '---'
