@@ -8,6 +8,7 @@ The application is built using Python and utilizes spaCy NLP libraries such as s
 ## Features
 
 - File uploader for uploading .srt subtitle files
+- Check YouTube videos
 - English language level detection based on analysis of the subtitle file
 
 ## Dependencies
