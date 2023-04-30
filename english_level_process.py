@@ -83,6 +83,7 @@ class ProcessData():
             movies['lemmas'] = movies.content.transform(lambda text: 
                                                         ' '.join([w.lemma_.strip() 
                                                                   for w in self.nlp(re.sub(r'[^a-z\s\']', '', text))
+                                                                  if not w.is_stop and w.pos_!='PROPN'
                                                                  ])
                                                        )
             
