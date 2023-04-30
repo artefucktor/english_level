@@ -60,13 +60,15 @@ with st.spinner('Рассчитываем...'):
 
 '---'
 # расшифровываем предикт в юзер-френдли форму и выводим на страницу
-current_level = ENGLISH_LEVELS[min(round(level)-1, len(ENGLISH_LEVELS)-1)]
-floor_level   = ENGLISH_LEVELS[min(int(level)-1, len(ENGLISH_LEVELS)-1)]
-ceil_level    = ENGLISH_LEVELS[min(int(level), len(ENGLISH_LEVELS)-1)]
-sub_level     = '+' if 0.2 <=level%1<0.5 or level>len(ENGLISH_LEVELS)-1 \
-                    else '+/'+ceil_level if 0.5<=level%1<0.8 \
-                    else ''
-user_level    = floor_level + sub_level
+max_level   = len(ENGLISH_LEVELS)-1
+round_level = ENGLISH_LEVELS[min(round(level), max_level)]
+floor_level = ENGLISH_LEVELS[min(int(level), max_level)]
+ceil_level  = ENGLISH_LEVELS[min(int(level)+1, max_level)]
+
+user_level    = ENGLISH_LEVELS[max_level]+'+' if level>=max_level else \
+                floor_level+'+' if 0.2<=level%1<0.5 else \
+                floor_level+'+/'+ceil_level if 0.5<=level%1<0.8 else \
+                round_level
 
 st.subheader('Уровень сложности')
 st.write(f'Для оценки мы используем опыт специалистов и словари Oxford. '
@@ -82,8 +84,8 @@ for i in range(min(round(1/6 * level * 100),101)):
 
 '---'
 # подсчитаем уровни слов по оксфорду
-words_under_level = movies[[l + 'ratio' for l in ENGLISH_LEVELS[:min(round(level),5)]]].sum(axis=1)[0]
-words_upper_level = movies[[l + 'ratio' for l in ENGLISH_LEVELS[round(level):5]]].sum(axis=1)[0]
+words_under_level = movies[[l + 'ratio' for l in ENGLISH_LEVELS[:min(round(level),max_level)]]].sum(axis=1)[0]
+words_upper_level = movies[[l + 'ratio' for l in ENGLISH_LEVELS[min(round(level),max_level):max_level]]].sum(axis=1)[0]
 
 st.subheader('Стандарт CEFR')
 st.write('В словарях Oxford 3000 и 5000 — наиболее важные слова, которые должен знать каждый, кто учит английский.')
@@ -93,10 +95,10 @@ st.write('Словарь Oxford соответствует стандартам 
 st.write('Мы рассчитали, слова какого уровня чаще всего встречаются в фильме:')
 
 if words_under_level > 0:
-    st.progress(words_under_level, text=f"{words_under_level:.0%} слов до {current_level} уровня включительно")
+    st.progress(words_under_level, text=f"{words_under_level:.0%} слов до {round_level} уровня включительно")
 
 if words_upper_level > 0:
-    st.progress(words_upper_level, text=f"{words_upper_level:.0%} слов превышают уровень {current_level} по сложности")
+    st.progress(words_upper_level, text=f"{words_upper_level:.0%} слов превышают уровень {round_level} по сложности")
 
 st.write('остальные слова не имеют определенного уровня.')
     

@@ -14,7 +14,7 @@ import pysrt
 class ProcessData():
     
     def __init__(self):
-        self.ENGLISH_LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1']
+        self.ENGLISH_LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2']
         self.oxford_words = load(os.path.dirname(__file__) + '/english_level_oxford.joblib')
         self.nlp = spacy.load("en_core_web_sm")
     
