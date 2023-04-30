@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+
 import os
+import re
 import time
 
 import streamlit as st
@@ -9,9 +11,12 @@ import pandas as pd
 
 import pysrt
 import chardet
+import requests
 
 from joblib import load
 from english_level_process import ProcessData
+from youtube_transcript_api import YouTubeTranscriptApi
+from youtube_transcript_api.formatters import SRTFormatter
 
 ENGLISH_LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2']
 EXAMPLE_SUBS   = 'Fear.2023.720p.WEBRip.x264.AAC-[HQCINEMAS.COM].srt'
@@ -21,6 +26,14 @@ level = 1
 # загружаем модель и класс с предобработкой
 model = load(DIRNAME + '/english_level_model.joblib')
 process = ProcessData()
+
+def demo_subs():
+    global filename, content
+    st.write('Демо-файл')
+    filename = EXAMPLE_SUBS
+    fullpath = os.path.join(DIRNAME,filename)
+    encoding = chardet.detect(open(fullpath, "rb").read())['encoding']
+    content = pysrt.open(fullpath, encoding=encoding)
 
 # шапка страницы
 st.set_page_config(page_title='Уровень английского в субтитрах', 
@@ -34,22 +47,39 @@ with st.container():
     st.markdown('*по субтитрам* 📺 *в фильме*')
     
 uploaded_file = st.file_uploader('Загрузите файл с субтитрами в формате .srt', type='.srt')
+youtube = st.text_input('или укажите ссылку на YouTube-видео')
+confirm = st.button('Проверить видео по ссылке')
 
 if uploaded_file is not None:
     # если файл загружен, то определяем кодировку, декодируем и передаем в pysrt
-    encoding = chardet.detect(uploaded_file.getvalue())['encoding']
-    content = pysrt.from_string(uploaded_file.getvalue().decode(encoding))
-    filename = uploaded_file.name
+    try:
+        encoding = chardet.detect(uploaded_file.getvalue())['encoding']
+        content = pysrt.from_string(uploaded_file.getvalue().decode(encoding))
+        filename = uploaded_file.name
+    except:
+        st.error(f'К сожалению, не удалось распознать файл')
+        demo_subs()
+elif youtube!='' and confirm:
+    try:
+        pattern = r'(v=[\w-]+)|(youtu\.be\/[\w-]+)|(embed\/[\w-]+)'
+        video_id = re.split(r'[^\w-]',re.search(pattern, youtube).group())[-1]
+        transcript = YouTubeTranscriptApi.get_transcript(video_id,languages=['en'])
+        formatter = SRTFormatter()
+        srt = formatter.format_transcript(transcript)
+        content = pysrt.from_string(srt)
+        filename = youtube
+    except:
+        st.error(f'К сожалению, субтитры {youtube} недоступны')
+        demo_subs()
 else:
     # по умолчанию показываем демо-файл
-    st.write('Например')
-    filename = EXAMPLE_SUBS
-    fullpath = os.path.join(DIRNAME,filename)
-    encoding = chardet.detect(open(fullpath, "rb").read())['encoding']
-    content = pysrt.open(fullpath, encoding=encoding)
+    demo_subs()
 
 # обработка файла и предсказание
 st.subheader(filename)
+i = 5 
+st.markdown(f'**Образец: первые {i} титров**')
+st.info('\n\n'.join(' '.join([str(s.start), s.text]) for s in content[:i]))
 with st.spinner('Рассчитываем...'):
     movies = process.process_data(content)
     if len(movies)>0:
