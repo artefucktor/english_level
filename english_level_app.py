@@ -109,7 +109,7 @@ for i in range(min(round(1/6 * level * 100),101)):
 
     
 '---'
-st.subheader(f'Preview: первые 5 титров')
+st.subheader(f'Просмотр: первые 5 титров')
 st.info('\n\n'.join(' '.join([str(s.start), s.text]) for s in content[:5]))
 
 
