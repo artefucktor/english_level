@@ -44,7 +44,7 @@ class ProcessData():
                 if item.duration.ordinal>0:
                     line = self.process_line(item.text_without_tags)
                     text.append(line)
-                    duration.append(item.duration.to_time())
+                    duration.append(item.duration.ordinal*1000.0)
                     charsrate.append(item.characters_per_second)
                     wordsrate.append(len(line.split())/item.duration.ordinal*1000.0)
             except:
@@ -80,12 +80,30 @@ class ProcessData():
                 movies[col] = None
                         
             # lemmatization
-            movies['lemmas'] = movies.content.transform(lambda text: 
-                                                        ' '.join([w.lemma_.strip() 
-                                                                  for w in self.nlp(re.sub(r'[^a-z\s\']', '', text))
-                                                                  if not w.is_stop and w.pos_!='PROPN'
-                                                                 ])
-                                                       )
+            movies['lemmas_pos'] = movies.content.transform(lambda x: [[token.lemma_ , token.pos_]
+                                                                       for token in nlp(re.sub(r'-', '', x))
+                                                                       if  not token.ent_type 
+                                                                       and not token.is_punct
+                                                                       and not token.is_currency
+                                                                       and not token.is_digit
+                                                                       and not token.is_space
+                                                                       and not token.is_stop
+                                                                       and not token.like_num
+                                                                       and not token.like_url
+                                                                       and not token.like_email
+                                                                      ])         
+            
+            movies['lemmas'] = movies.lemmas_pos.transform(lambda x: ' '.join(item[0] for item in x))
+            movies['pos']    = movies.lemmas_pos.transform(lambda x: ' '.join(item[1] for item in x)) 
+            
+            movies['sents'] = movies.content.transform(lambda x: list(nlp(x).sents))
+            
+            # count of sentences
+            # lengths of sentences
+            # median length
+            movies['sents_count']  = movies.sents.transform(lambda x: len(x))
+            movies['sents_length'] = movies.sents.transform(lambda x: [len(sent) for sent in x])
+            movies['sents_median'] = movies.sents_length.transform(lambda x: np.median(x))
             
             # total lemmas count
             # and unique lemmas count
@@ -116,6 +134,10 @@ class ProcessData():
                 movies[more_col + 'ratio']  = movies[more_col] / movies.lemmas_count
                 movies[less_col + 'ratio']  = movies[less_col] / movies.lemmas_count
 
-            movies = movies.fillna(0)
+            # speed rates in seconds
+            for c in ['duration', 'charsrate', 'wordsrate']:
+                movies[c+'_median'] = movies[c].transform(lambda x: np.median(x))
+
+        movies = movies.fillna(0)
 
         return movies
