@@ -24,7 +24,7 @@ DIRNAME = os.path.dirname(__file__)
 level = 1
 
 # загружаем модель и класс с предобработкой
-model = load(DIRNAME + '/english_level_model.joblib')
+model = load(os.path.join(DIRNAME,'english_level_model.joblib')
 process = ProcessData()
 
 # шапка страницы
