@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-import warnings
 import re
 import os
+import warnings
 
+import numpy as np
 import pandas as pd
 from joblib import load
 
@@ -81,7 +82,7 @@ class ProcessData():
                         
             # lemmatization
             movies['lemmas_pos'] = movies.content.transform(lambda x: [[token.lemma_ , token.pos_]
-                                                                       for token in nlp(re.sub(r'-', '', x))
+                                                                       for token in self.nlp(re.sub(r'-', '', x))
                                                                        if  not token.ent_type 
                                                                        and not token.is_punct
                                                                        and not token.is_currency
@@ -91,12 +92,12 @@ class ProcessData():
                                                                        and not token.like_num
                                                                        and not token.like_url
                                                                        and not token.like_email
-                                                                      ])         
-            
+                                                                      ])
+
             movies['lemmas'] = movies.lemmas_pos.transform(lambda x: ' '.join(item[0] for item in x))
             movies['pos']    = movies.lemmas_pos.transform(lambda x: ' '.join(item[1] for item in x)) 
             
-            movies['sents'] = movies.content.transform(lambda x: list(nlp(x).sents))
+            movies['sents'] = movies.content.transform(lambda x: list(self.nlp(x).sents))
             
             # count of sentences
             # lengths of sentences
